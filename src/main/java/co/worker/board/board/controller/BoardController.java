@@ -70,7 +70,7 @@ public class BoardController {
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE
 			)
-	public ResponseEntity get(@PathVariable Long seq) {
+	public ResponseEntity get(@PathVariable("seq") Long seq) {
 		return ResponseEntity.ok(boardService.getBoard(seq));
 	}
 	
@@ -84,7 +84,7 @@ public class BoardController {
 	
 	// put - update
 	@PutMapping(value = "/{seq}", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity edit(@PathVariable Long seq, @RequestBody @Valid BoardParam boardParam) {
+	public ResponseEntity edit(@PathVariable("seq") Long seq, @RequestBody @Valid BoardParam boardParam) {
 		boardParam.setSeq(seq);
 		boardService.edit(boardParam);
 		return ResponseEntity.ok(null);
@@ -92,9 +92,9 @@ public class BoardController {
 	
 	// delete - delete
 	@DeleteMapping(value = "/{seq}", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity delete(@PathVariable Long seq) {
+	public ResponseEntity delete(@PathVariable("seq") Long seq) {
 		boardService.delete(seq);
-		return ResponseEntity.of(null);
+		return ResponseEntity.ok(null);
 	}
 	
 }

@@ -133,8 +133,8 @@ public class BoardControllerTest {
 	}
 	
 	@Test
-	public void deleteBoard() throws Exception {
-		mockMvc.perform(delete("/api/boards/5")
+	public void deleteBoardOne() throws Exception {
+		mockMvc.perform(delete("/api/boards/3")
 				.contentType(MediaType.APPLICATION_JSON_VALUE))
 				.andDo(print())
 				.andExpect(status().isOk());
