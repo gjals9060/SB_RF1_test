@@ -17,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import co.worker.board.board.model.BoardEntity;
@@ -77,69 +76,125 @@ public class BoardControllerTest {
 	        boardRepository.save(board);
 	    }
 	}
+//	
+//	// CRUD 테스트
+//	@Test
+//	public void getBoard() throws Exception {
+//		mockMvc.perform(get("/api/boards/all")
+//				.contentType(MediaType.APPLICATION_JSON_VALUE))
+//				.andDo(print())
+//				.andExpect(status().isOk());
+//	}
+//	 
+//	@Test
+//	public void getBoardOne() throws Exception {
+//		mockMvc.perform(get("/api/boards/1")
+//				.contentType(MediaType.APPLICATION_JSON_VALUE)
+//				.accept(MediaType.APPLICATION_JSON_VALUE))
+//				.andDo(print())
+//				.andExpect(status().isOk());
+//	}
+//	
+//	@Test
+//	public void addBoard() throws Exception {
+//		BoardParam boardParam = BoardParam.builder()
+//				.content("추가내용")
+//				.title("추가제목")
+//				.username("추가유저")
+//				.build();
+//		
+//		mockMvc.perform(post("/api/boards/add")
+//				.contentType(MediaType.APPLICATION_JSON_VALUE)
+//				.accept(MediaType.APPLICATION_JSON_VALUE)
+//				.content(objectMapper.writeValueAsBytes(boardParam)))
+//				.andDo(print())
+//				.andExpect(status().isOk())
+//				.andReturn();
+//		this.getBoard();
+//	}
+//	
+//	
+//	@Test
+//	public void editBoard() throws Exception {
+//		
+//		BoardParam boardParam = BoardParam.builder()
+//				.content("수정내용")
+//				.title("수정제목")
+//				.username("수정유저")
+//				.build();
+//		
+//		mockMvc.perform(put("/api/boards/3")
+//				.contentType(MediaType.APPLICATION_JSON_VALUE)
+//				.accept(MediaType.APPLICATION_JSON_VALUE)
+//				.content(objectMapper.writeValueAsBytes(boardParam)))
+//				.andDo(print())
+//				.andExpect(status().isOk());
+//		this.getBoard();
+//	}
+//	
+//	@Test
+//	public void deleteBoardOne() throws Exception {
+//		mockMvc.perform(delete("/api/boards/3")
+//				.contentType(MediaType.APPLICATION_JSON_VALUE))
+//				.andDo(print())
+//				.andExpect(status().isOk());
+//		this.getBoard();
+//	}
 	
-	@Test
-	public void getBoard() throws Exception {
-		mockMvc.perform(get("/api/boards/all")
-				.contentType(MediaType.APPLICATION_JSON_VALUE))
-				.andDo(print())
-				.andExpect(status().isOk());
-	}
-	 
-	@Test
-	public void getBoardOne() throws Exception {
-		mockMvc.perform(get("/api/boards/1")
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.accept(MediaType.APPLICATION_JSON_VALUE))
-				.andDo(print())
-				.andExpect(status().isOk());
-	}
+	//Bad_Request 테스트
+    @Test //add
+    public void board_BadRequest_add() throws Exception{
+    	//username not null
+        BoardParam param = BoardParam.builder().content("test")
+                                    .title("test").build(); 
+        
+        // content not empty
+        /*BoardParam param = BoardParam.builder().title("title")
+                                    .content("")
+                                    .username("woo").build(); 
+       */ 
+        mockMvc.perform(post("/api/boards/add")
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .content(objectMapper.writeValueAsString(param)))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
 	
-	@Test
-	public void addBoard() throws Exception {
-		BoardParam boardParam = BoardParam.builder()
-				.content("추가내용")
-				.title("추가제목")
-				.username("추가유저")
-				.build();
-		
-		mockMvc.perform(post("/api/boards/add")
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.accept(MediaType.APPLICATION_JSON_VALUE)
-				.content(objectMapper.writeValueAsBytes(boardParam)))
-				.andDo(print())
-				.andExpect(status().isOk())
-				.andReturn();
-		this.getBoard();
-	}
+    @Test
+    public void board_BadRequest_getOne() throws Exception{
+    	//0 이하인 경우 @Min 어노테이션으로 잡는지 확인.
+        mockMvc.perform(get("/api/boards/-1")
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void board_BadRequest_edit() throws Exception {
+    	//username null
+        BoardParam param = BoardParam.builder()
+        							.content("test")
+                                    .title("test")
+                                    .build();
+        
+        // seq min 0
+        /*BoardParam param = BoardParam.builder()
+        							.content("test")
+                                    .title("test")
+                                    .username("gg")
+                                    .build();*/
+        
+        mockMvc.perform(put("/api/boards/-1")
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(param)))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+    
 	
-	
-	@Test
-	public void editBoard() throws Exception {
-		
-		BoardParam boardParam = BoardParam.builder()
-				.content("수정내용")
-				.title("수정제목")
-				.username("수정유저")
-				.build();
-		
-		mockMvc.perform(put("/api/boards/3")
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.accept(MediaType.APPLICATION_JSON_VALUE)
-				.content(objectMapper.writeValueAsBytes(boardParam)))
-				.andDo(print())
-				.andExpect(status().isOk());
-		this.getBoard();
-	}
-	
-	@Test
-	public void deleteBoardOne() throws Exception {
-		mockMvc.perform(delete("/api/boards/3")
-				.contentType(MediaType.APPLICATION_JSON_VALUE))
-				.andDo(print())
-				.andExpect(status().isOk());
-		this.getBoard();
-	}
 }
 
 
