@@ -48,6 +48,7 @@ import co.worker.board.board.repository.BoardRepository;
  * 			: perform() 메서드를 이용하여 요청을 전송하면, 그 결과로 ResultActions 객체를 리턴하는데, 
  * 			ResultActions는 응답 결과를 검증할 수 있는 andExpect() 메서드를 제공한다.
  * 
+ * 		andReturn()
  * 	# 에러
  * 		initializationError : 테스트 시 src/test/java 내부와 src/main/java 내부의 각 위치가 동일해야함.
  */
@@ -76,70 +77,76 @@ public class BoardControllerTest {
 	        boardRepository.save(board);
 	    }
 	}
-//	
-//	// CRUD 테스트
-//	@Test
-//	public void getBoard() throws Exception {
-//		mockMvc.perform(get("/api/boards/all")
-//				.contentType(MediaType.APPLICATION_JSON_VALUE))
-//				.andDo(print())
-//				.andExpect(status().isOk());
-//	}
-//	 
-//	@Test
-//	public void getBoardOne() throws Exception {
-//		mockMvc.perform(get("/api/boards/1")
-//				.contentType(MediaType.APPLICATION_JSON_VALUE)
-//				.accept(MediaType.APPLICATION_JSON_VALUE))
-//				.andDo(print())
-//				.andExpect(status().isOk());
-//	}
-//	
-//	@Test
-//	public void addBoard() throws Exception {
-//		BoardParam boardParam = BoardParam.builder()
-//				.content("추가내용")
-//				.title("추가제목")
-//				.username("추가유저")
-//				.build();
-//		
-//		mockMvc.perform(post("/api/boards/add")
-//				.contentType(MediaType.APPLICATION_JSON_VALUE)
-//				.accept(MediaType.APPLICATION_JSON_VALUE)
-//				.content(objectMapper.writeValueAsBytes(boardParam)))
-//				.andDo(print())
-//				.andExpect(status().isOk())
-//				.andReturn();
-//		this.getBoard();
-//	}
-//	
-//	
-//	@Test
-//	public void editBoard() throws Exception {
-//		
-//		BoardParam boardParam = BoardParam.builder()
-//				.content("수정내용")
-//				.title("수정제목")
-//				.username("수정유저")
-//				.build();
-//		
-//		mockMvc.perform(put("/api/boards/3")
-//				.contentType(MediaType.APPLICATION_JSON_VALUE)
-//				.accept(MediaType.APPLICATION_JSON_VALUE)
-//				.content(objectMapper.writeValueAsBytes(boardParam)))
-//				.andDo(print())
-//				.andExpect(status().isOk());
-//		this.getBoard();
-//	}
-//	
-//	@Test
-//	public void deleteBoardOne() throws Exception {
-//		mockMvc.perform(delete("/api/boards/3")
-//				.contentType(MediaType.APPLICATION_JSON_VALUE))
-//				.andDo(print())
-//				.andExpect(status().isOk());
-//		this.getBoard();
-//	}
+	
+	// CRUD 테스트
+	@Test
+	public void getBoard() throws Exception {
+		mockMvc.perform(
+				get("/api/boards/all")
+					.contentType(MediaType.APPLICATION_JSON_VALUE)
+					.accept(MediaType.APPLICATION_JSON_VALUE))
+				.andDo(print())
+				.andExpect(status().isOk());
+	}
+	 
+	@Test
+	public void getBoardOne() throws Exception {
+		mockMvc.perform(
+				get("/api/boards/1")
+					.contentType(MediaType.APPLICATION_JSON_VALUE)
+					.accept(MediaType.APPLICATION_JSON_VALUE))
+				.andDo(print())
+				.andExpect(status().isOk());
+	}
+	
+	@Test
+	public void addBoard() throws Exception {
+		BoardParam boardParam = BoardParam.builder()
+				.content("추가내용")
+				.title("추가제목")
+				.username("추가유저")
+				.build();
+		
+		mockMvc.perform(
+				post("/api/boards/add")
+					.contentType(MediaType.APPLICATION_JSON_VALUE)
+					.accept(MediaType.APPLICATION_JSON_VALUE)
+					.content(objectMapper.writeValueAsString(boardParam)))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andReturn();
+		this.getBoard();
+	}
+	
+	
+	@Test
+	public void editBoard() throws Exception {
+		
+		BoardParam boardParam = BoardParam.builder()
+				.content("수정내용")
+				.title("수정제목")
+				.username("수정유저")
+				.build();
+		
+		mockMvc.perform(
+				put("/api/boards/3")
+					.contentType(MediaType.APPLICATION_JSON_VALUE)
+					.accept(MediaType.APPLICATION_JSON_VALUE)
+					.content(objectMapper.writeValueAsString(boardParam)))
+				.andDo(print())
+				.andExpect(status().isOk());
+		this.getBoard();
+	}
+	
+	@Test
+	public void deleteBoardOne() throws Exception {
+		mockMvc.perform(
+				delete("/api/boards/3")
+					.contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andDo(print())
+				.andExpect(status().isOk());
+		this.getBoard();
+	}
 	
 	//Bad_Request 테스트
     @Test //add
@@ -153,20 +160,22 @@ public class BoardControllerTest {
                                     .content("")
                                     .username("woo").build(); 
        */ 
-        mockMvc.perform(post("/api/boards/add")
-            .accept(MediaType.APPLICATION_JSON_VALUE)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .content(objectMapper.writeValueAsString(param)))
-                .andDo(print())
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(
+        		post("/api/boards/add")
+		            .accept(MediaType.APPLICATION_JSON_VALUE)
+		            .contentType(MediaType.APPLICATION_JSON_VALUE)
+		            .content(objectMapper.writeValueAsString(param)))
+        		.andDo(print())
+        		.andExpect(status().isBadRequest());
     }
 	
     @Test
     public void board_BadRequest_getOne() throws Exception{
     	//0 이하인 경우 @Min 어노테이션으로 잡는지 확인.
-        mockMvc.perform(get("/api/boards/-1")
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .contentType(MediaType.APPLICATION_JSON_VALUE))
+        mockMvc.perform(
+        		get("/api/boards/-1")
+	                .accept(MediaType.APPLICATION_JSON_VALUE)
+	                .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
@@ -186,10 +195,11 @@ public class BoardControllerTest {
                                     .username("gg")
                                     .build();*/
         
-        mockMvc.perform(put("/api/boards/-1")
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(param)))
+        mockMvc.perform(
+        		put("/api/boards/-1")
+	                .accept(MediaType.APPLICATION_JSON_VALUE)
+	                .contentType(MediaType.APPLICATION_JSON_VALUE)
+	                .content(objectMapper.writeValueAsString(param)))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }

@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,39 @@ public class BoardService {
 	@Autowired
 	private BoardRepository boardRepository;
 	
+	private ModelMapper modelMapper;
+	/*
+	 * 	# ModelMapper이란?
+	 * 	암시적으로 매핑해줌. 현 예제의 BoardEntity -> BoardResult는 필드가 동일하지만
+	 * 
+	 * 
+	 * 		<소스 모델>				===============>>		<목적 모델>
+	 * 	class Order {					ㅣ			class OrderDTO {
+	 * 	  Customer customer;			ㅣ				String customerFirstName;
+	 * 	  Address billingAddress;		ㅣ				String customerLastName;
+	 * 	}								ㅣ				String billingStreet;
+	 * 									ㅣ				String billingCity;
+	 * 	class Customer {				ㅣ			}
+	 * 	  Name name;					ㅣ
+	 * 	}
+	 * 	
+	 * 	class Name {
+	 * 	  String firstName;
+	 * 	  String lastName;
+	 * 	}
+	 * 	
+	 * 	class Address {
+	 * 	  String street;
+	 * 	  String city;
+	 * 	}
+	 * 	
+	 * 	ModelMapper modelMapper = new ModelMapper();
+	 * 	OrderDTO orderDTO = modelMapper.map(order, OrderDTO.class);
+	 * 	이러한 매핑도 가능.
+	 * 
+	 * 
+	 */
+	
 	@Transactional
 	public List<BoardResult> getBoard(){
 		
@@ -37,12 +71,7 @@ public class BoardService {
 		List<BoardResult> results = entityList.stream().map(boardEntity -> {
 			
 			BoardResult boardResult = new BoardResult();
-			
-			boardResult.setContent(boardEntity.getContent());
-            boardResult.setUsername(boardEntity.getUsername());
-            boardResult.setTitle(boardEntity.getTitle());
-            boardResult.setSeq(boardEntity.getSeq());
-            
+			modelMapper.map(boardEntity, boardResult);
             return boardResult;
             
 		}).collect(Collectors.toList());
@@ -65,12 +94,19 @@ public class BoardService {
 	
 	@Transactional
 	public BoardResult getBoard(Long seq) {	//return 타입 : BoardResult <-> Object랑 비교 해보자
-		return boardRepository.findById(seq).map(BoardEntity -> {
+//		return boardRepository.findById(seq).map(BoardEntity -> {
+//			BoardResult boardResult = new BoardResult();
+//			boardResult.setContent(BoardEntity.getContent());
+//			boardResult.setTitle(BoardEntity.getTitle());
+//			boardResult.setUsername(BoardEntity.getUsername());
+//			boardResult.setSeq(BoardEntity.getSeq());
+//			return boardResult;
+//		}).get();
+//			==> 기존 setter를 이용한 매핑을 수정. -> modelMapper사용
+//			==> 만약 필드가 많거나 관계형 객체일때  소스낭비를 크게 줄임
+		return boardRepository.findById(seq).map(boardEntity -> {
 			BoardResult boardResult = new BoardResult();
-			boardResult.setContent(BoardEntity.getContent());
-			boardResult.setTitle(BoardEntity.getTitle());
-			boardResult.setUsername(BoardEntity.getUsername());
-			boardResult.setSeq(BoardEntity.getSeq());
+			modelMapper.map(boardEntity, boardResult);
 			return boardResult;
 		}).get();
 	}
@@ -88,9 +124,7 @@ public class BoardService {
 	public void edit(BoardParam boardParam) {
 		Optional<BoardEntity> boardEntity = boardRepository.findById(boardParam.getSeq());
 		boardEntity.ifPresent(entity -> {
-			entity.setContent(boardParam.getContent());
-			entity.setTitle(boardParam.getTitle());
-			entity.setUsername(boardParam.getUsername());
+			modelMapper.map(boardParam, entity);
 			boardRepository.save(entity);
 		});
 	}
