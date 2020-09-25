@@ -30,7 +30,7 @@ public class BoardService {
 	
 	@Autowired
 	private BoardRepository boardRepository;
-	
+	@Autowired
 	private ModelMapper modelMapper;
 	/*
 	 * 	# ModelMapper이란?
